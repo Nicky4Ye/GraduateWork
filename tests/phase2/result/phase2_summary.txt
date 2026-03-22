@@ -1,0 +1,7 @@
+Phase2 GA verification
+Start: (412, 118), Goal: (1382, 1490)
+Path length: 1971.3536
+Smoothness: 183.0000
+Nodes: 1624
+Valid: True
+Rho: 0.1927, Alpha: 1.3717
