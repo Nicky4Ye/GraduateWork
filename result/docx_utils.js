@@ -581,12 +581,24 @@ function parseInlineMathRaw(text) {
 
 /**
  * Create a body text paragraph (正文).
- * Handles inline math via $...$.
+ * Handles inline math via $...$ and citations [1][2].
  * @param {string} text
  * @param {object} [opts] - extra Paragraph options
  */
 function createBodyParagraph(text, opts = {}) {
-  const children = buildTextRuns(text, SIZE.BODY, FONT.CN_SONG);
+  // Check if text contains citations
+  const hasCitations = /\[\d+/.test(text);
+  
+  let children;
+  
+  if (hasCitations) {
+    // Use citation-aware parsing
+    children = parseCitations(text, SIZE.BODY, FONT.CN_SONG);
+  } else {
+    // Use standard text run building (handles math)
+    children = buildTextRuns(text, SIZE.BODY, FONT.CN_SONG);
+  }
+  
   return new Paragraph({
     alignment: AlignmentType.JUSTIFIED,
     spacing: { line: 360 },
@@ -762,6 +774,66 @@ function createTableCaption(text) {
   });
 }
 
+// ─── Citation formatting helpers ────────────────────────────────────────────
+
+/**
+ * Parse text and convert inline citations like [30][2][12] to superscript format.
+ * Citations in brackets at end of sentences become superscript.
+ * Citations mentioned in text like "文献[8, 10-14]" remain inline with normal font size.
+ * 
+ * Returns an array of TextRun option objects.
+ */
+function parseCitations(text, fontSize = SIZE.BODY, cnFont = FONT.CN_SONG) {
+  if (!text) return [];
+  
+  const runs = [];
+  // Pattern to match citation groups (one or more consecutive bracketed numbers)
+  const citationGroupPattern = /(\[\d+(?:[,，\s]*\d+)*(?:[-–]\d+)?\](?:\s*\[\d+(?:[,，\s]*\d+)*(?:[-–]\d+)?\])*)/g;
+  
+  let lastIndex = 0;
+  let match;
+  
+  while ((match = citationGroupPattern.exec(text)) !== null) {
+    const citationGroup = match[1];
+    const matchStart = match.index;
+    
+    // Check if this is a textual citation (preceded by "文献")
+    const precedingText = text.substring(Math.max(0, matchStart - 10), matchStart);
+    const isTextualCitation = /文献$/.test(precedingText.trim());
+    
+    // Add text before this citation group
+    if (matchStart > lastIndex) {
+      const beforeText = text.substring(lastIndex, matchStart);
+      const beforeRuns = makeBodyRuns(beforeText, fontSize, cnFont);
+      runs.push(...beforeRuns);
+    }
+    
+    if (isTextualCitation) {
+      // Keep as inline normal text
+      const inlineRuns = makeBodyRuns(citationGroup, fontSize, cnFont);
+      runs.push(...inlineRuns);
+    } else {
+      // Convert to superscript
+      runs.push({
+        text: citationGroup,
+        verticalAlign: "superscript",
+        font: { name: cnFont },
+        size: fontSize,
+      });
+    }
+    
+    lastIndex = matchStart + citationGroup.length;
+  }
+  
+  // Add remaining text
+  if (lastIndex < text.length) {
+    const remainingRuns = makeBodyRuns(text.substring(lastIndex), fontSize, cnFont);
+    runs.push(...remainingRuns);
+  }
+  
+  return runs.length > 0 ? runs : makeBodyRuns(text, fontSize, cnFont);
+}
+
 // ─── Convenience: empty paragraph / spacing paragraph ───────────────────────
 
 function createEmptyParagraph(spacing = {}) {
@@ -785,6 +857,9 @@ module.exports = {
   parseInlineMath,
   latexToSegments,
   latexToPlain,
+
+  // Citation helpers
+  parseCitations,
 
   // Run-level helpers
   makeBodyRuns,
