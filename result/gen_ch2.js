@@ -14,6 +14,7 @@ const {
   createH3,
   createBodyParagraph,
   createBlockMath,
+  createFormulaWithNumber,
 } = require("./docx_utils");
 
 // ─── Build paragraphs ──────────────────────────────────────────────────────
@@ -21,7 +22,7 @@ const {
 const children = [];
 
 // ── H1 ──
-children.push(createH1("第二章 环境建模与算法基础原理"));
+children.push(createH1("2 环境建模与算法基础原理"));
 
 // ── Intro paragraph ──
 children.push(
@@ -51,7 +52,7 @@ children.push(
 );
 
 children.push(
-  createBlockMath("G = \\{g_{ij} \\mid i=1,2,...,m;\\ j=1,2,...,n\\}")
+  createFormulaWithNumber("G = \\{g_{ij} \\mid i=1,2,...,m;\\ j=1,2,...,n\\}", "2.1")
 );
 
 children.push(
@@ -85,8 +86,9 @@ children.push(
 );
 
 children.push(
-  createBlockMath(
-    "\\rho = \\frac{\\sum_{i=1}^{m}\\sum_{j=1}^{n} \\mathbb{1}(G_{i,j}=1)}{m \\times n}"
+  createFormulaWithNumber(
+    "\\rho = \\frac{\\sum_{i=1}^{m}\\sum_{j=1}^{n} \\mathbb{1}(G_{i,j}=1)}{m \\times n}",
+    "2.2"
   )
 );
 
@@ -110,7 +112,7 @@ children.push(
   )
 );
 
-children.push(createBlockMath("f(n) = g(n) + h(n)"));
+children.push(createFormulaWithNumber("f(n) = g(n) + h(n)", "2.3"));
 
 children.push(
   createBodyParagraph(
@@ -283,7 +285,7 @@ children.push(
   )
 );
 
-children.push(createBlockMath("P_i = \\frac{f_i}{\\sum_j f_j}"));
+children.push(createFormulaWithNumber("P_i = \\frac{f_i}{\\sum_j f_j}", "2.4"));
 
 children.push(
   createBodyParagraph(
@@ -336,6 +338,29 @@ children.push(
   )
 );
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 2.4 本章小结
+// ═══════════════════════════════════════════════════════════════════════════
+children.push(createH2("2.4 本章小结"));
+
+children.push(
+  createBodyParagraph(
+    "本章首先介绍了栅格地图的构建方法与坐标表示，建立了环境建模的数学基础。栅格地图采用二值化表示方式，将连续空间离散化为规则的二维矩阵，便于碰撞检测和路径搜索。同时定义了障碍物密度指标，为后续改进A*算法的动态权重设计提供了量化依据。"
+  )
+);
+
+children.push(
+  createBodyParagraph(
+    "随后，本章详细阐述了A*算法的基本原理，包括评估函数的设计、启发式函数的选择以及算法的执行流程，并分析了传统A*算法在搜索效率、路径平滑性、环境自适应性和多目标优化能力等方面的局限性。这些局限性为第三章的改进A*算法设计指明了方向。"
+  )
+);
+
+children.push(
+  createBodyParagraph(
+    "最后，本章介绍了遗传算法的基本原理和关键算子设计，包括编码方式、选择、交叉和变异操作，并分析了传统遗传算法在收敛速度、局部最优陷阱、参数敏感性、约束处理和局部精化能力等方面的不足。这些分析为第四章的自适应遗传算法改进提供了理论支撑。"
+  )
+);
+
 // ─── Assemble document and write ───────────────────────────────────────────
 
 const doc = new Document({
@@ -351,7 +376,8 @@ const doc = new Document({
 
 (async () => {
   const buffer = await Packer.toBuffer(doc);
-  const outPath = path.join(__dirname, "第二章.docx");
+  const outPath = path.join(__dirname, "adjust", "第二章.docx");
+  try { fs.unlinkSync(outPath); } catch (e) {}
   fs.writeFileSync(outPath, buffer);
   console.log("✅ 第二章.docx generated at:", outPath);
 })();

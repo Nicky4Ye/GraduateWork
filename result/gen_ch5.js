@@ -23,7 +23,7 @@ const {
 const children = [];
 
 // H1
-children.push(createH1("第五章 仿真实验与结果分析"));
+children.push(createH1("5 仿真实验与结果分析"));
 
 // 5.1
 children.push(createH2("5.1 实验环境与参数设置"));
@@ -500,6 +500,29 @@ children.push(
 );
 
 // ═══════════════════════════════════════════════════════════════════════════
+// 5.9 本章小结
+// ═══════════════════════════════════════════════════════════════════════════
+children.push(createH2("5.9 本章小结"));
+
+children.push(
+  createBodyParagraph(
+    "本章通过五阶段系统实验，全面验证了本文所提融合路径规划方法的有效性。首先介绍了实验环境与参数设置，包括软硬件平台、算法参数和测试用例设计。随后建立了包含路径长度、平滑度、转折点数、规划耗时和路径有效性五项指标的评价体系。"
+  )
+);
+
+children.push(
+  createBodyParagraph(
+    "在阶段一的基础路径算法对比实验中，验证了改进A*算法相比Standard A*和Dijkstra在搜索效率方面的显著优势。在阶段二的遗传算法融合验证实验中，证明了改进A*提供的初始种群在短距离场景下具有更好的优化潜力。在阶段三的融合方案与多算法对比实验中，展示了融合算法在综合性能上的优势。在阶段四的JPS对比实验中，分析了融合方案与JPS在速度和质量上的权衡。在阶段五的两种融合方案对比实验中，确定了Improved A*+GA作为推荐方案的地位。"
+  )
+);
+
+children.push(
+  createBodyParagraph(
+    "实验结果表明，本文所提融合方法在路径长度、平滑度、转折点数等多个维度上均取得了较好的性能，为复杂栅格环境下的移动机器人路径规划提供了有效的解决方案。"
+  )
+);
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Build & save document
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -510,7 +533,8 @@ const doc = new Document({
 });
 
 Packer.toBuffer(doc).then((buffer) => {
-  const outPath = path.join(__dirname, "第五章.docx");
+  const outPath = path.join(__dirname, "adjust", "第五章.docx");
+  try { fs.unlinkSync(outPath); } catch (e) {}
   fs.writeFileSync(outPath, buffer);
   console.log("✅ Generated:", outPath);
 });

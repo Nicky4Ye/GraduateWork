@@ -16,7 +16,7 @@ async function main() {
   const children = [];
 
   // ── Title ──
-  children.push(createH1("第一章 绪论"));
+  children.push(createH1("1 绪论"));
 
   // ── 1.1 研究背景与意义 ──
   children.push(createH2("1.1 研究背景与意义"));
@@ -96,6 +96,13 @@ async function main() {
     "（4）系统实验验证与分析。在1500×1500的大规模栅格地图上设计五阶段对比实验，将所提融合方案分别与Standard A*、Dijkstra、JPS及JPS+GA等多种基准算法进行系统比较，从路径长度、平滑度、转折点数量、计算效率和路径有效性等多个维度全面评估算法性能。"
   ));
 
+  // ── 1.4 本章小结 ──
+  children.push(createH2("1.4 本章小结"));
+
+  children.push(createBodyParagraph(
+    "本章首先阐述了移动机器人路径规划问题的研究背景与实际意义，分析了路径规划在智能制造、智慧物流等领域的核心地位。随后，系统梳理了传统路径规划算法（A*、Dijkstra、JPS）和智能优化算法（遗传算法）的研究现状，指出了各类算法的优势与局限性。在此基础上，分析了现有融合算法研究的不足之处，明确了本文的研究切入点。最后，概述了本文的主要研究内容，包括改进A*算法设计、自适应遗传算法设计、路径修复机制设计以及系统实验验证四个方面，为后续章节的展开奠定了基础。"
+  ));
+
   // ── Build document ──
   const doc = new Document({
     ...PAGE_PROPERTIES,
@@ -109,7 +116,8 @@ async function main() {
   });
 
   const buffer = await Packer.toBuffer(doc);
-  const outPath = path.join(__dirname, "第一章.docx");
+  const outPath = path.join(__dirname, "adjust", "第一章.docx");
+  try { fs.unlinkSync(outPath); } catch (e) {}
   fs.writeFileSync(outPath, buffer);
   console.log("✅ Generated:", outPath);
 }

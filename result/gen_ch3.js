@@ -19,6 +19,7 @@ const {
   createH3,
   createBodyParagraph,
   createBlockMath,
+  createFormulaWithNumber,
   buildTextRuns,
   makeBodyRuns,
   latexToSegments,
@@ -49,7 +50,7 @@ const children = [];
 // ═══════════════════════════════════════════════════════════════════════════
 // H1
 // ═══════════════════════════════════════════════════════════════════════════
-children.push(createH1("第三章 融合路径规划算法设计与实现"));
+children.push(createH1("3 融合路径规划算法设计与实现"));
 
 // ── Intro paragraph ──
 children.push(
@@ -82,7 +83,7 @@ children.push(
 );
 
 children.push(
-  createBlockMath("\\alpha(\\rho) = 1 + \\frac{2\\rho}{1+\\rho^2}")
+  createFormulaWithNumber("\\alpha(\\rho) = 1 + \\frac{2\\rho}{1+\\rho^2}", "3.1")
 );
 
 children.push(
@@ -92,7 +93,7 @@ children.push(
 );
 
 children.push(
-  createBlockMath("X_i = A^*(G, s, g, \\alpha), \\quad \\alpha \\in [1.0, 2.0]")
+  createFormulaWithNumber("X_i = A^*(G, s, g, \\alpha), \\quad \\alpha \\in [1.0, 2.0]", "3.2")
 );
 
 // ── 第二阶段 ──
@@ -104,7 +105,7 @@ children.push(
 );
 
 children.push(
-  createBlockMath("F(X) = -(\\omega_1 L(X) + \\omega_2 S(X) + \\omega_3 T(X) + P(X))")
+  createFormulaWithNumber("F(X) = -(\\omega_1 L(X) + \\omega_2 S(X) + \\omega_3 T(X) + P(X))", "3.3")
 );
 
 children.push(
@@ -148,7 +149,7 @@ children.push(
 );
 
 children.push(
-  createBlockMath("f(n) = g(n) + \\alpha(\\rho)h(n)")
+  createFormulaWithNumber("f(n) = g(n) + \\alpha(\\rho)h(n)", "3.4")
 );
 
 children.push(
@@ -182,7 +183,7 @@ children.push(
 );
 
 children.push(
-  createBlockMath("\\alpha(\\rho) = 1 + \\frac{2\\rho}{1+\\rho^2}")
+  createFormulaWithNumber("\\alpha(\\rho) = 1 + \\frac{2\\rho}{1+\\rho^2}", "3.5")
 );
 
 children.push(
@@ -201,8 +202,9 @@ children.push(
 );
 
 children.push(
-  createBlockMath(
-    "\\rho = \\frac{\\sum_{i=1}^{m}\\sum_{j=1}^{n} \\mathbb{1}(G_{i,j}=1)}{m \\times n}"
+  createFormulaWithNumber(
+    "\\rho = \\frac{\\sum_{i=1}^{m}\\sum_{j=1}^{n} \\mathbb{1}(G_{i,j}=1)}{m \\times n}",
+    "3.6"
   )
 );
 
@@ -220,7 +222,7 @@ children.push(
 );
 
 children.push(
-  createBlockMath("h(n) = |x_n - x_g| + |y_n - y_g|")
+  createFormulaWithNumber("h(n) = |x_n - x_g| + |y_n - y_g|", "3.7")
 );
 
 children.push(
@@ -442,6 +444,29 @@ children.push(
   )
 );
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 3.5 本章小结
+// ═══════════════════════════════════════════════════════════════════════════
+children.push(createH2("3.5 本章小结"));
+
+children.push(
+  createBodyParagraph(
+    "本章首先阐述了融合算法的总体架构，构建了\"初始路径生成—进化全局优化—路径修复保障\"的三阶段协同工作框架。该框架将改进A*算法与自适应遗传算法有机融合，实现了算法层面的深度耦合，充分发挥了两类算法的各自优势。"
+  )
+);
+
+children.push(
+  createBodyParagraph(
+    "随后，本章详细介绍了改进A*算法的核心设计。在优化启发函数方面，提出了基于障碍物密度的动态权重调整策略，使算法能够根据环境复杂度自适应调节搜索行为。在搜索策略方面，采用8邻域扩展策略增强路径的全向移动能力。在路径平滑优化方面，设计了冗余点删除和折线段简化两步后处理方法，显著提升了路径的平滑性和简洁性。"
+  )
+);
+
+children.push(
+  createBodyParagraph(
+    "本章内容为第四章的自适应遗传算法设计奠定了基础，改进A*算法生成的初始路径将作为遗传算法的高质量初始种群，大幅缩短进化收敛时间。"
+  )
+);
+
 // ─── Assemble document and write ───────────────────────────────────────────
 
 const doc = new Document({
@@ -457,7 +482,8 @@ const doc = new Document({
 
 (async () => {
   const buffer = await Packer.toBuffer(doc);
-  const outPath = path.join(__dirname, "第三章.docx");
+  const outPath = path.join(__dirname, "adjust", "第三章.docx");
+  try { fs.unlinkSync(outPath); } catch (e) {}
   fs.writeFileSync(outPath, buffer);
   console.log("✅ 第三章.docx generated at:", outPath);
 })();

@@ -19,6 +19,7 @@ const {
   createH3,
   createBodyParagraph,
   createBlockMath,
+  createFormulaWithNumber,
   buildTextRuns,
   makeBodyRuns,
   latexToSegments,
@@ -47,7 +48,7 @@ const children = [];
 // ═══════════════════════════════════════════════════════════════════════════
 // H1
 // ═══════════════════════════════════════════════════════════════════════════
-children.push(createH1("第四章 自适应遗传算法优化"));
+children.push(createH1("4 自适应遗传算法优化"));
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 4.1 自适应遗传算法设计
@@ -76,7 +77,7 @@ children.push(
 );
 
 children.push(
-  createBlockMath("X_i = A^*(G, s, g, \\alpha), \\quad \\alpha \\in [1.0, 2.0]")
+  createFormulaWithNumber("X_i = A^*(G, s, g, \\alpha), \\quad \\alpha \\in [1.0, 2.0]", "4.1")
 );
 
 children.push(
@@ -141,7 +142,7 @@ children.push(
 );
 
 children.push(
-  createBlockMath("F(X) = -(\\omega_1 L(X) + \\omega_2 S(X) + \\omega_3 T(X) + P(X))")
+  createFormulaWithNumber("F(X) = -(\\omega_1 L(X) + \\omega_2 S(X) + \\omega_3 T(X) + P(X))", "4.2")
 );
 
 children.push(
@@ -158,7 +159,7 @@ children.push(
 );
 
 children.push(
-  createBlockMath("L(X) = \\sum_{i=1}^{|X|-1} d(X_i, X_{i+1})")
+  createFormulaWithNumber("L(X) = \\sum_{i=1}^{|X|-1} d(X_i, X_{i+1})", "4.3")
 );
 
 children.push(
@@ -175,7 +176,7 @@ children.push(
 );
 
 children.push(
-  createBlockMath("S(X) = \\sum_{i=2}^{|X|-1} \\| (X_i - X_{i-1}) - (X_{i-1} - X_{i-2}) \\|")
+  createFormulaWithNumber("S(X) = \\sum_{i=2}^{|X|-1} \\| (X_i - X_{i-1}) - (X_{i-1} - X_{i-2}) \\|", "4.4")
 );
 
 children.push(
@@ -206,7 +207,7 @@ children.push(
 
 // Piecewise P(X) rendered as two lines of block math
 children.push(
-  createBlockMath("P(X) = -\\chi, \\quad \\text{若路径经过障碍物}; \\quad P(X) = 0, \\quad \\text{否则}")
+  createFormulaWithNumber("P(X) = -\\chi, \\quad \\text{若路径经过障碍物}; \\quad P(X) = 0, \\quad \\text{否则}", "4.5")
 );
 
 children.push(
@@ -234,10 +235,10 @@ children.push(
 
 // Piecewise Pc formula rendered as two block math lines
 children.push(
-  createBlockMath("P_c = P_c^{max} - (P_c^{max} - P_c^{min})(f_{max} - f_i)/(f_{max} - f_{avg}), \\quad \\text{当} f_i > f_{avg}")
+  createFormulaWithNumber("P_c = P_c^{max} - (P_c^{max} - P_c^{min})(f_{max} - f_i)/(f_{max} - f_{avg}), \\quad \\text{当} f_i > f_{avg}", "4.6")
 );
 children.push(
-  createBlockMath("P_c = P_c^{max}, \\quad \\text{当} f_i \\leq f_{avg}")
+  createFormulaWithNumber("P_c = P_c^{max}, \\quad \\text{当} f_i \\leq f_{avg}", "4.7")
 );
 
 children.push(
@@ -277,10 +278,10 @@ children.push(
 
 // Piecewise Pm formula rendered as two block math lines
 children.push(
-  createBlockMath("P_m = P_m^{min} + (P_m^{max} - P_m^{min})(f_{max} - f_i)/(f_{max} - f_{avg}), \\quad \\text{当} f_i > f_{avg}")
+  createFormulaWithNumber("P_m = P_m^{min} + (P_m^{max} - P_m^{min})(f_{max} - f_i)/(f_{max} - f_{avg}), \\quad \\text{当} f_i > f_{avg}", "4.8")
 );
 children.push(
-  createBlockMath("P_m = P_m^{max}, \\quad \\text{当} f_i \\leq f_{avg}")
+  createFormulaWithNumber("P_m = P_m^{max}, \\quad \\text{当} f_i \\leq f_{avg}", "4.9")
 );
 
 children.push(
@@ -326,7 +327,7 @@ children.push(
 );
 
 children.push(
-  createBlockMath("Parent \\propto \\text{softmax}(F(X))")
+  createFormulaWithNumber("p_i = \\frac{\\exp(F_i)}{\\sum_j \\exp(F_j)}", "4.10")
 );
 
 children.push(
@@ -594,6 +595,29 @@ children.push(
   )
 );
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 4.4 本章小结
+// ═══════════════════════════════════════════════════════════════════════════
+children.push(createH2("4.4 本章小结"));
+
+children.push(
+  createBodyParagraph(
+    "本章详细阐述了自适应遗传算法的设计与实现。首先，提出了基于改进A*的种群初始化方法，利用不同权重参数生成多样化的高质量初始种群，显著提升了进化起点。其次，设计了综合适应度函数，将路径长度、平滑度、转折点数和碰撞惩罚等多个目标有机整合，实现了多目标优化。"
+  )
+);
+
+children.push(
+  createBodyParagraph(
+    "在遗传算子方面，本章提出了基于个体适应度的自适应交叉率和变异率策略，使算法能够根据个体质量和进化阶段动态调整参数，平衡了全局探索与局部开发能力。同时，设计了精英保留策略和Softmax选择机制，保证了进化过程的稳定性和收敛性。"
+  )
+);
+
+children.push(
+  createBodyParagraph(
+    "最后，本章介绍了路径修复机制的设计，包括碰撞检测、绕障修复和连通性验证三个核心步骤，有效解决了遗传操作产生的不可行路径问题，提高了种群利用率和收敛效率。本章内容与第三章的改进A*算法共同构成了完整的融合路径规划框架。"
+  )
+);
+
 // ─── Assemble document and write ───────────────────────────────────────────
 
 const doc = new Document({
@@ -609,7 +633,8 @@ const doc = new Document({
 
 (async () => {
   const buffer = await Packer.toBuffer(doc);
-  const outPath = path.join(__dirname, "第四章.docx");
+  const outPath = path.join(__dirname, "adjust", "第四章.docx");
+  try { fs.unlinkSync(outPath); } catch (e) {}
   fs.writeFileSync(outPath, buffer);
   console.log("✅ 第四章.docx generated at:", outPath);
 })();

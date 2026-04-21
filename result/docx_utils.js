@@ -98,6 +98,57 @@ const STYLES = {
         indent: { firstLine: 480 }, // 2 char indent ≈ 480 twips at 12pt
       },
     },
+    // Heading 1 style for TOC
+    {
+      id: "Heading1",
+      name: "Heading 1",
+      basedOn: "Normal",
+      next: "Normal",
+      quickFormat: true,
+      run: {
+        font: FONT.CN_HEI,
+        size: SIZE.H1,
+        bold: true,
+      },
+      paragraph: {
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 240, after: 240, line: 360 },
+      },
+    },
+    // Heading 2 style for TOC
+    {
+      id: "Heading2",
+      name: "Heading 2",
+      basedOn: "Normal",
+      next: "Normal",
+      quickFormat: true,
+      run: {
+        font: FONT.CN_HEI,
+        size: SIZE.H2,
+        bold: true,
+      },
+      paragraph: {
+        alignment: AlignmentType.JUSTIFIED,
+        spacing: { before: 156, after: 156, line: 360 },
+      },
+    },
+    // Heading 3 style for TOC
+    {
+      id: "Heading3",
+      name: "Heading 3",
+      basedOn: "Normal",
+      next: "Normal",
+      quickFormat: true,
+      run: {
+        font: FONT.CN_HEI,
+        size: SIZE.H3,
+        bold: false,
+      },
+      paragraph: {
+        alignment: AlignmentType.JUSTIFIED,
+        spacing: { before: 120, after: 120, line: 360 },
+      },
+    },
   ],
 };
 
@@ -531,18 +582,15 @@ function buildTextRuns(text, fontSize, cnFont, extraRunOpts = {}) {
 
   for (const part of parts) {
     if (part.isMath) {
-      const segs = latexToSegments(part.latex);
-      for (const seg of segs) {
-        runs.push(
-          new TextRun({
-            text: seg.text,
-            italics: seg.italic !== false,
-            bold: seg.bold || extraRunOpts.bold || false,
-            font: { name: FONT.EN },
-            size: fontSize,
-          })
-        );
-      }
+      // Display LaTeX code in monospace font for clarity
+      runs.push(
+        new TextRun({
+          text: `$${part.latex}$`,
+          font: { name: "Courier New" },
+          size: fontSize,
+          italics: false,
+        })
+      );
     } else {
       // plain text — split by CJK
       const plainRuns = makeBodyRuns(part.text, fontSize, cnFont, extraRunOpts);
@@ -593,7 +641,9 @@ function createBodyParagraph(text, opts = {}) {
   
   if (hasCitations) {
     // Use citation-aware parsing
-    children = parseCitations(text, SIZE.BODY, FONT.CN_SONG);
+    const runs = parseCitations(text, SIZE.BODY, FONT.CN_SONG);
+    // Convert plain objects to TextRun instances
+    children = runs.map(run => new TextRun(run));
   } else {
     // Use standard text run building (handles math)
     children = buildTextRuns(text, SIZE.BODY, FONT.CN_SONG);
@@ -611,10 +661,12 @@ function createBodyParagraph(text, opts = {}) {
 /**
  * Create an H1 heading paragraph (一级标题).
  * 三号(16pt) 黑体+TNR 加粗
+ * Uses HeadingLevel.HEADING_1 for TOC recognition
  */
 function createH1(text) {
   const children = buildTextRuns(text, SIZE.H1, FONT.CN_HEI, { bold: true });
   return new Paragraph({
+    heading: HeadingLevel.HEADING_1,
     alignment: AlignmentType.CENTER,
     spacing: { before: 240, after: 240, line: 360 },
     children,
@@ -624,10 +676,12 @@ function createH1(text) {
 /**
  * Create an H2 heading paragraph (二级标题).
  * 小四号(12pt) 黑体 加粗
+ * Uses HeadingLevel.HEADING_2 for TOC recognition
  */
 function createH2(text) {
   const children = buildTextRuns(text, SIZE.H2, FONT.CN_HEI, { bold: true });
   return new Paragraph({
+    heading: HeadingLevel.HEADING_2,
     alignment: AlignmentType.JUSTIFIED,
     spacing: { before: 156, after: 156, line: 360 },
     children,
@@ -637,10 +691,12 @@ function createH2(text) {
 /**
  * Create an H3 heading paragraph (三级标题).
  * 小四号(12pt) 黑体 不加粗
+ * Uses HeadingLevel.HEADING_3 for TOC recognition
  */
 function createH3(text) {
   const children = buildTextRuns(text, SIZE.H3, FONT.CN_HEI, {});
   return new Paragraph({
+    heading: HeadingLevel.HEADING_3,
     alignment: AlignmentType.JUSTIFIED,
     spacing: { before: 120, after: 120, line: 360 },
     children,
@@ -649,24 +705,53 @@ function createH3(text) {
 
 /**
  * Create a centered block-math paragraph for $$...$$ formulas.
+ * Displays LaTeX code in monospace font for clarity.
  * @param {string} latex — the LaTeX string (without $$ delimiters)
  */
 function createBlockMath(latex) {
-  const segs = latexToSegments(latex);
-  const children = segs.map(
-    (seg) =>
-      new TextRun({
-        text: seg.text,
-        italics: seg.italic !== false,
-        bold: !!seg.bold,
-        font: { name: FONT.EN },
-        size: SIZE.BODY,
-      })
-  );
   return new Paragraph({
     alignment: AlignmentType.CENTER,
     spacing: { before: 120, after: 120, line: 360 },
-    children,
+    children: [
+      new TextRun({
+        text: latex,
+        font: { name: "Courier New" },
+        size: SIZE.BODY,
+      }),
+    ],
+  });
+}
+
+/**
+ * Create a formula paragraph with equation number.
+ * Formula is centered, equation number is right-aligned in parentheses.
+ * Displays LaTeX code in monospace font for clarity.
+ * @param {string} latex — the LaTeX string (without $$ delimiters)
+ * @param {string} eqNumber — equation number like "1.1", "2.3", "A1" etc.
+ */
+function createFormulaWithNumber(latex, eqNumber) {
+  // Add tab for right alignment of equation number
+  return new Paragraph({
+    alignment: AlignmentType.CENTER,
+    spacing: { before: 120, after: 120, line: 360 },
+    tabStops: [
+      {
+        type: TabStopType.RIGHT,
+        position: 9000, // Right side of page
+      },
+    ],
+    children: [
+      new TextRun({
+        text: latex,
+        font: { name: "Courier New" },
+        size: SIZE.BODY,
+      }),
+      new TextRun({
+        text: `\t(${eqNumber})`,
+        font: { name: "Courier New" },
+        size: SIZE.BODY,
+      }),
+    ],
   });
 }
 
@@ -816,7 +901,7 @@ function parseCitations(text, fontSize = SIZE.BODY, cnFont = FONT.CN_SONG) {
       // Convert to superscript
       runs.push({
         text: citationGroup,
-        verticalAlign: "superscript",
+        superScript: true,
         font: { name: cnFont },
         size: fontSize,
       });
@@ -871,6 +956,7 @@ module.exports = {
   createH2,
   createH3,
   createBlockMath,
+  createFormulaWithNumber,
   createFigureCaption,
   createSpecialHeading,
   createEmptyParagraph,
@@ -890,4 +976,5 @@ module.exports = {
   BorderStyle,
   WidthType,
   Document,
+  HeadingLevel,
 };
